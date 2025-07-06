@@ -1,0 +1,24 @@
+# Git specific files
+.git
+.gitignore
+
+# Node modules (these will be installed inside the container)
+node_modules
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docker related files that shouldn't be in the image context itself
+Dockerfile
+.dockerignore
+
+# Documentation / Other files not needed in the image
+README.md
+AGENTS.md
+Procfile
+# Add any other local configuration or sensitive files if they exist
+# e.g., .env files (though these should ideally not be committed)
+# *.swp (vim swap files)
+# .DS_Store (macOS)

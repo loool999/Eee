@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jules' Unique Proxy</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Jules' Unique Proxy</h1>
+        <p>Experience the web, uniquely woven.</p>
+    </header>
+
+    <main>
+        <div class="controls">
+            <input type="text" id="urlInput" placeholder="Enter URL to proxy">
+            <select id="proxyEngineSelect">
+                <option value="wisp" selected>Wisp (Default - Requires Wisp Client)</option>
+                <option value="scramjet">Scramjet (Artistic Weaving)</option>
+                <option value="bare">Bare (Standard)</option>
+            </select>
+            <button id="goButton">Go</button>
+        </div>
+
+
+        <div class="output-container">
+            <iframe id="proxyFrame" title="Proxied Content"></iframe>
+        </div>
+
+        <div id="wisp-section" style="display:none; margin-top:2em;">
+            <h2>Wisp Proxy Result</h2>
+            <form id="wispForm" onsubmit="return false;" style="margin-bottom:1em;">
+                <input type="text" id="wispUrlInput" placeholder="Enter URL for Wisp proxy" style="width:40%;">
+                <select id="wispMethodInput">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="DELETE">DELETE</option>
+                    <option value="HEAD">HEAD</option>
+                    <option value="OPTIONS">OPTIONS</option>
+                </select>
+                <input type="text" id="wispHeadersInput" placeholder='Headers (JSON: {"Header":"Value"})' style="width:20%;">
+                <input type="text" id="wispBodyInput" placeholder="Body (for POST/PUT)" style="width:20%;">
+                <button id="wispSendButton">Send via Wisp</button>
+            </form>
+            <iframe id="wispFrame" style="width:100%;height:300px;display:none;"></iframe>
+            <pre id="wispResult" style="background:#222;color:#fff;padding:1em;overflow:auto;max-height:300px;"></pre>
+        </div>
+
+        <div class="instructions">
+            <h2>How to Use:</h2>
+            <ul>
+                <li><strong>Wisp:</strong> Enter a URL. Your client application (e.g., Ultraviolet, Stomp) must be configured to use <code>ws://[this_server_address]/wisp/</code> as its Wisp server. The content will appear in your client, not directly here. This page primarily serves as a landing/info page for Wisp.</li>
+                <li><strong>Scramjet:</strong> Enter a full URL (e.g., <code>http://example.com</code>). The page will be proxied through our Scramjet engine, featuring subtle "Artistic Weaving." Content appears in the frame below.</li>
+                <li><strong>Bare:</strong> Enter a full URL. The page will be proxied using the Bare server. Content appears in the frame below. Your client might also be configured to use <code>http://[this_server_address]/bare/</code>.</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>Proxy concept by Jules. Handle with care.</p>
+    </footer>
+
+    <script src="client.js"></script>
+</body>
+</html>
