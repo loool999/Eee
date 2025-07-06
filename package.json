@@ -1,0 +1,37 @@
+{
+  "name": "jules-unique-proxy",
+  "version": "1.0.0",
+  "description": "A unique web proxy with Wisp, Bare, and Scramjet (Artistic Weaving) support.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loool999/Eee.git"
+  },
+  "keywords": [
+    "proxy",
+    "web-proxy",
+    "wisp",
+    "bare-server",
+    "scramjet",
+    "nodejs",
+    "unique"
+  ],
+  "author": "Jules the AI",
+  "license": "MIT",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/loool999/Eee/issues"
+  },
+  "homepage": "https://github.com/loool999/Eee#readme",
+  "dependencies": {
+    "@tomphttp/bare-server-node": "^2.0.5",
+    "express": "^4.19.2",
+    "node-fetch": "^2.7.0",
+    "scramjet": "^4.37.0",
+    "ws": "^8.18.3"
+  }
+}

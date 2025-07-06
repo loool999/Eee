@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jules' Unique Proxy</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Jules' Unique Proxy</h1>
+        <p>Experience the web, uniquely woven.</p>
+    </header>
+
+    <main>
+        <div class="controls">
+            <input type="text" id="urlInput" placeholder="Enter URL to proxy">
+            <select id="proxyEngineSelect">
+                <option value="wisp" selected>Wisp (Default - Requires Wisp Client)</option>
+                <option value="scramjet">Scramjet (Artistic Weaving)</option>
+                <option value="bare">Bare (Standard)</option>
+            </select>
+            <button id="goButton">Go</button>
+        </div>
+
+        <div class="output-container">
+            <iframe id="proxyFrame" title="Proxied Content"></iframe>
+        </div>
+
+        <div class="instructions">
+            <h2>How to Use:</h2>
+            <ul>
+                <li><strong>Wisp:</strong> Enter a URL. Your client application (e.g., Ultraviolet, Stomp) must be configured to use <code>ws://[this_server_address]/wisp/</code> as its Wisp server. The content will appear in your client, not directly here. This page primarily serves as a landing/info page for Wisp.</li>
+                <li><strong>Scramjet:</strong> Enter a full URL (e.g., <code>http://example.com</code>). The page will be proxied through our Scramjet engine, featuring subtle "Artistic Weaving." Content appears in the frame below.</li>
+                <li><strong>Bare:</strong> Enter a full URL. The page will be proxied using the Bare server. Content appears in the frame below. Your client might also be configured to use <code>http://[this_server_address]/bare/</code>.</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>Proxy concept by Jules. Handle with care.</p>
+    </footer>
+
+    <script src="client.js"></script>
+</body>
+</html>
