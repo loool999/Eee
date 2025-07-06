@@ -46,21 +46,22 @@ document.addEventListener('DOMContentLoaded', () => {
         outputContainer.style.backgroundColor = '#eee'; // Reset background
 
         if (selectedEngine === 'wisp') {
-            // Wisp requires client-side handling (e.g., via a dedicated Wisp client or library)
-            // The server part is ws://localhost:PORT/wisp/
-            // This frontend doesn't directly interact with Wisp other than providing the URL.
-            // The user needs to configure their Wisp client (like Ultraviolet)
-            alert(`Wisp mode selected. Please ensure your Wisp client is configured to use this server's Wisp endpoint: ws://${window.location.host}/wisp/ with the URL: ${targetUrl}`);
-            // Optionally, you could try to dynamically set up a Wisp client here if one is bundled.
-            // For now, we assume an external client.
-            outputContainer.innerHTML = '<p style="text-align:center; padding: 20px;">Wisp mode: Use your Wisp-compatible client with the provided URL.</p>';
+            // Show Wisp section and hide iframe
+            document.getElementById('wisp-section').style.display = '';
+            document.getElementById('wispUrlInput').value = targetUrl;
+            proxyFrame.style.display = 'none';
             outputContainer.style.backgroundColor = '#fff';
-        } else if (selectedEngine === 'scramjet') {
+        } else {
+            document.getElementById('wisp-section').style.display = 'none';
+            proxyFrame.style.display = '';
+        }
+        if (selectedEngine === 'scramjet') {
             // Use the /scramjet-proxy/ endpoint
             // The target URL is passed as a query parameter
             proxyFrame.src = `/scramjet-proxy/?url=${encodeURIComponent(targetUrl)}`;
             outputContainer.style.backgroundColor = '#fff'; // Remove placeholder bg
-        } else if (selectedEngine === 'bare') {
+        }
+        if (selectedEngine === 'bare') {
             // For Bare, the client (iframe) needs to be served by the Bare server itself
             // or have its requests routed through Bare.
             // A common pattern for iframe-based Bare usage is:
@@ -89,5 +90,82 @@ document.addEventListener('DOMContentLoaded', () => {
             proxyFrame.src = `${barePrefix}${targetUrl}`;
             outputContainer.style.backgroundColor = '#fff';
         }
+    }
+    // Wisp client logic
+    const wispForm = document.getElementById('wispForm');
+    const wispUrlInput = document.getElementById('wispUrlInput');
+    const wispMethodInput = document.getElementById('wispMethodInput');
+    const wispHeadersInput = document.getElementById('wispHeadersInput');
+    const wispBodyInput = document.getElementById('wispBodyInput');
+    const wispSendButton = document.getElementById('wispSendButton');
+    const wispResult = document.getElementById('wispResult');
+    const wispFrame = document.getElementById('wispFrame');
+    let wispSocket = null;
+
+    if (wispForm) {
+        wispForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            sendWispRequest();
+        });
+    }
+    if (wispSendButton) {
+        wispSendButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            sendWispRequest();
+        });
+    }
+
+    function sendWispRequest() {
+        const url = wispUrlInput.value.trim();
+        const method = wispMethodInput.value;
+        let headers = {};
+        let body = wispBodyInput.value;
+        try {
+            headers = wispHeadersInput.value ? JSON.parse(wispHeadersInput.value) : {};
+        } catch (e) {
+            wispResult.textContent = 'Invalid headers JSON.';
+            return;
+        }
+        if (!url) {
+            wispResult.textContent = 'Please enter a URL.';
+            return;
+        }
+        if (wispSocket && wispSocket.readyState === 1) {
+            wispSocket.close();
+        }
+        wispResult.textContent = 'Connecting to Wisp server...';
+        wispFrame.style.display = 'none';
+        wispSocket = new WebSocket(`ws://${window.location.host}/wisp/`);
+        wispSocket.onopen = () => {
+            wispResult.textContent = 'Connected. Sending request...';
+            wispSocket.send(JSON.stringify({ url, method, headers, body }));
+        };
+        wispSocket.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                // If response is HTML, show in iframe, else show as text
+                const contentType = (data.headers && (data.headers['content-type'] || data.headers['Content-Type'])) || '';
+                if (contentType.includes('text/html')) {
+                    const blob = new Blob([data.body], { type: contentType });
+                    const url = URL.createObjectURL(blob);
+                    wispFrame.src = url;
+                    wispFrame.style.display = '';
+                    wispResult.textContent = '';
+                } else {
+                    wispFrame.style.display = 'none';
+                    wispResult.textContent = JSON.stringify(data, null, 2);
+                }
+            } catch (e) {
+                wispFrame.style.display = 'none';
+                wispResult.textContent = event.data;
+            }
+        };
+        wispSocket.onerror = (err) => {
+            wispResult.textContent = 'WebSocket error.';
+            wispFrame.style.display = 'none';
+        };
+        wispSocket.onclose = () => {
+            // Optionally handle close
+        };
     }
 });

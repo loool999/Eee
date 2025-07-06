@@ -2,13 +2,13 @@ const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
-const { BareServer } = require('@tomphttp/bare-server-node');
+const { createBareServer } = require('@tomphttp/bare-server-node');
 const { StringStream } = require('scramjet'); // Import Scramjet StringStream
 const fetch = require('node-fetch'); // For making outbound requests
 
 const app = express();
 const server = http.createServer(app);
-const bareServer = new BareServer('/bare/', { // Initialize BareServer
+const bareServer = createBareServer('/bare/', { // Initialize BareServer
     logErrors: true, // Optional: for debugging
     // Other BareServer options can be added here
 });
@@ -51,27 +51,43 @@ server.on('upgrade', (req, socket, head) => {
 
 // Placeholder for the actual Wisp connection handling logic
 // This will be significantly more complex in a real implementation
+
+// Minimal working Wisp-like proxy handler (JSON-based, not full binary Wisp protocol)
 function handleWispConnection(ws) {
     console.log('Wisp client connected');
 
-    // TODO: Implement actual Wisp protocol handling here.
-    // This involves parsing Wisp frames, making outbound requests, and relaying data.
-    // For now, this is a placeholder.
-
-    ws.on('message', (message) => {
-        // This is a very simplified placeholder.
-        // Actual Wisp communication involves binary data frames.
-        console.log('Received raw message from Wisp client (length):', message.length);
-
-        // Example: If you expect a specific handshake or initial message
-        // if (message.toString() === 'wisp-handshake-init') {
-        //     ws.send('wisp-handshake-ack');
-        // } else {
-        //     // Forward/process message according to Wisp spec
-        //     ws.send('Wisp message received by server, actual processing TBD.');
-        // }
-
-        // For now, we'll just log and not send anything back until full protocol is implemented
+    ws.on('message', async (message) => {
+        try {
+            // Expecting JSON: { url: "https://example.com", method: "GET", headers: {}, body: "" }
+            let reqData;
+            try {
+                reqData = JSON.parse(message.toString());
+            } catch (e) {
+                ws.send(JSON.stringify({ error: 'Invalid JSON' }));
+                return;
+            }
+            if (!reqData.url) {
+                ws.send(JSON.stringify({ error: 'Missing url' }));
+                return;
+            }
+            const fetchOptions = {
+                method: reqData.method || 'GET',
+                headers: reqData.headers || {},
+                body: reqData.body || undefined
+            };
+            const response = await fetch(reqData.url, fetchOptions);
+            const resHeaders = {};
+            response.headers.forEach((v, k) => { resHeaders[k] = v; });
+            const resBody = await response.text();
+            ws.send(JSON.stringify({
+                status: response.status,
+                statusText: response.statusText,
+                headers: resHeaders,
+                body: resBody
+            }));
+        } catch (err) {
+            ws.send(JSON.stringify({ error: err.message }));
+        }
     });
 
     ws.on('close', () => {
