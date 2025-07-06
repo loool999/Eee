@@ -1,0 +1,6 @@
+Flask>=2.0
+wisp-python>=0.7.0 # As per the MercuryWorkshop/wisp-server-python README
+gunicorn>=20.0 # Optional: for more robust deployment than Flask dev server
+beautifulsoup4>=4.9.3 # For HTML parsing/rewriting
+lxml>=4.6.3 # Often used as a faster parser with BeautifulSoup
+requests>=2.25.1 # For fetching content in the debug rewriter endpoint
